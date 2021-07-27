@@ -3,39 +3,61 @@ import csv
 
 rows = []
 
-with open('Stars.csv', 'r') as f:
-    csv_r = csv.reader(f)
+with open("Stars.csv", 'r') as f:
+    csvreader = csv.reader(f)
 
-    for i in csv_r:
-        rows.append(i)
+    for row in csvreader:
+        rows.append(row)
 
 headers = rows[0]
 
-stars_data = rows[1:]
+star_data = rows[1:]
 
-headers[0] = 'Index'
+final_list = []
 
-star_data = []
+df = pd.read_csv("stars.csv")
 
-for star in stars_data:
-    if star[3] != '?': 
-        star[3] = float(star[3].strip("\'"))*1.989e+30
-    
-    if star[4] != '?':
-        star[4] = float(star[4].strip("\'"))*6.957e+8
+solar_mass_list = df["solar_mass"].tolist()
 
-    star_data.append(star)
+solar_radius_list = df["solar_radius"].tolist()
 
-star_data_gravity = []
+solar_mass_list.pop(0)
 
-for star in star_data:
-    if star[3] != '?' and star[4] != '?':
-        gravity = (6.674e-11 * float(star[3]))/(float(star[4])*float(star[4]))
+solar_radius_list.pop(0)
 
-    star.append(gravity)
-    star_data_gravity.append(star)
+star_solar_mass_si_unit = []
 
-Star_name = []
+for data in solar_mass_list:
+    si_unit = float(data) * 1.989e+30
+    star_solar_mass_si_unit.append(si_unit)
+
+print(star_solar_mass_si_unit)
+
+star_solar_radius_si_unit = []
+
+for data in solar_radius_list:
+    si_unit = float(data) * 6.957e+8
+    star_solar_radius_si_unit.append(si_unit)
+
+print(star_solar_radius_si_unit)
+
+star_masses = star_solar_mass_si_unit
+
+star_radiuses = star_solar_radius_si_unit
+
+star_names = df["star_names"].tolist()
+
+star_names.pop(0)
+
+star_gravities = []
+
+for index, data in enumerate(star_names):
+    gravity = (float(star_masses[index]) * 5.972e+24) / (float(star_radiuses[index]) * float(star_radiuses[index]) * 6371000 * 6371000) * 6.674e-11
+    star_gravities.append(gravity)
+
+print(star_gravities)
+
+Star_names = []
 
 Distance = []
 
@@ -45,16 +67,16 @@ Radius = []
 
 Gravity = []
 
-for i in star_data_gravity:
-    Star_name.append(i[1])
+for i in final_list:
+    Star_names.append(i[1])
     Distance.append(i[2])
     Mass.append(i[3])
     Radius.append(i[4])
     Gravity.append(i[5])
 
 df = pd.DataFrame(
-    list(zip(Star_name, Distance, Mass, Radius, gravity)),
+    list(zip(Star_names, Distance, Mass, Radius, Gravity)),
     columns=["Star Name", "Distance", "Mass", "Radius", "Gravity"],
 )
 
-df.to_csv('final.csv')
+df.to_csv('Final.csv')
